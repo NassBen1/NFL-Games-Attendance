@@ -28,6 +28,10 @@ def NettoyageDocumentAttendance(df):
     df['year'] = df['year'].astype(int)
     df['week'] = df['week'].astype(int)
 
+    #Modifier anciens noms d'équipe par les nouveaux
+    df['team_name_complet'] = df['team_name_complet'].replace('St. Louis Rams', 'Los Angeles Rams')
+    df['team_name_complet'] = df['team_name_complet'].replace('San Diego Chargers', 'Los Angeles Chargers')
+
     return df
 
 
@@ -84,7 +88,7 @@ def TRaitementFichierStandings(df_stand, df_attendance) :
 def FinalDataframeNFL(df_attendance) :
 
     #Garder uniquement les colonnes nécessaire
-    df_attendance = df_attendance[[ 'team_name_complet', 'team_name_x', 'year_x', 'week', 'weekly_attendance', 'team', 'wins', 'loss', 'points_for', 'points_against', 'points_differential', 'playoffs', 'sb_winner']]
+    df_attendance = df_attendance[[ 'team_name_complet', 'team_name_x', 'year_x', 'week', 'weekly_attendance', 'wins', 'loss', 'points_for', 'points_against', 'points_differential', 'playoffs', 'sb_winner']]
     df_attendance = df_attendance.rename(columns={'team_name_x': 'team_name', 'year_x': 'year'})
 
 
