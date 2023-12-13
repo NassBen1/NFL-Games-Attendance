@@ -21,6 +21,9 @@ def NettoyageDocumentAttendance(df):
     # Création identifiant unique pour la jointure avec les autres fichiers
     df['IdMatch'] = df['team_name'] + 'Y' + df['year'] + 'W' + df['week']
 
+    #Création identifiant unique avec seulent le nom de l'équipe et l'année
+    df['IdMatchYear'] = df['team_name'] + 'Y' + df['year']
+
     # Passage en int des colonnes Year et Week
     df['year'] = df['year'].astype(int)
     df['week'] = df['week'].astype(int)
@@ -41,6 +44,7 @@ def TraitementFichierGames(df):
     # Création de la colonne IDMatchAway
     df_double['IdMatchAway'] = df_double['away_team_name'] + 'Y' + df_double['year'].astype(str) + 'W' + df_double[
         'week'].astype(str)
+
 
     # Mettre sur les lignes d'index pair home et pour les impairs away
     df_double['HomeAway'] = np.where(df_double.index % 2 == 0, 'Home', 'Away')
@@ -67,6 +71,25 @@ def TraitementFichierGamesAH(df_home, df_away, df_attendance):
 
     return df_home, df_away
 
+def TRaitementFichierStandings(df_stand, df_attendance) :
+
+    #Création de la colonne IDMatchYear pour df_stand
+    df_stand['IdMatchYear'] = df_stand['team_name'] + 'Y' + df_stand['year'].astype(str)
+
+    #Jointure de df_attendance avec ajout des données de df_stand
+    df_attendance = df_attendance.merge(df_stand, how='left', left_on='IdMatchYear', right_on='IdMatchYear')
+
+    return df_attendance
+
+def FinalDataframeNFL(df_attendance) :
+
+    #Garder uniquement les colonnes nécessaire
+    df_attendance = df_attendance[[ 'team_name_complet', 'team_name_x', 'year_x', 'week', 'weekly_attendance', 'team', 'wins', 'loss', 'points_for', 'points_against', 'points_differential', 'playoffs', 'sb_winner']]
+    df_attendance = df_attendance.rename(columns={'team_name_x': 'team_name', 'year_x': 'year'})
+
+
+    return df_attendance
+
 
 if __name__ == "__main__":
     # Ouverture DataFrame avec le nombre de spectateur par match et par équipe
@@ -77,5 +100,13 @@ if __name__ == "__main__":
     df_games = TraitementFichierGames(df_games)
     df_games_home, df_games_away = CreationDataFrameHomeAway(df_games)
     df_games_home, df_games_away = TraitementFichierGamesAH(df_games_home, df_games_away, df_attendance)
+    df_attendance = TRaitementFichierStandings(df_standings, df_attendance)
+    dfNFLFinal = FinalDataframeNFL(df_attendance)
+    #Export du fichier en csv pour visualisation
+    dfNFLFinal.to_csv('data/NFLFinal.csv', index=False)
+    print(dfNFLFinal.head())
+    print("Traitement du fichier NFL terminé")
+
+
 
 
